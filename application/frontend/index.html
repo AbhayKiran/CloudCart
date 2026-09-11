@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CloudCart</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://picsum.photos" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="brand">
+                <span class="brand-mark">CC</span>
+                <span class="brand-name">CloudCart</span>
+            </div>
+            <div class="nav-links">
+                <a href="#products">Shop</a>
+                <a href="#orders">Orders</a>
+            </div>
+            <div class="status" id="statusBadge">
+                <span class="dot"></span>
+                <span id="statusText">Checking…</span>
+            </div>
+            <!-- Auth area: populated by script.js (renderAuthNav) based on login state -->
+            <div class="auth-nav" id="authNav"></div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-inner">
+            <p class="eyebrow">New season essentials</p>
+            <h1>Tech that keeps up with you</h1>
+            <p class="hero-subtitle">Laptops, keyboards and accessories — picked for speed, priced fair.</p>
+            <a href="#products" class="hero-cta">Shop the collection ↓</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="products" class="container">
+            <div class="section-heading">
+                <h2>Featured Products</h2>
+                <p class="section-sub">Fresh stock, straight from the warehouse.</p>
+            </div>
+
+            <div id="productGrid" class="product-grid">
+                <!-- product cards injected by script.js -->
+            </div>
+        </section>
+
+        <section id="feedback" class="feedback hidden container"></section>
+
+        <section id="orders" class="container orders-section">
+            <div class="section-heading">
+                <h2>Recent Orders</h2>
+                <p class="section-sub">Track what you've just bought.</p>
+            </div>
+            <div id="orderList" class="order-list">
+                <p class="empty-state">No orders yet. Order a product above.</p>
+            </div>
+        </section>
+
+        <section class="perks">
+            <div class="perks-inner">
+                <div class="perk">
+                    <span class="perk-icon">🚚</span>
+                    <div>
+                        <strong>Fast Dispatch</strong>
+                        <p>Orders processed instantly by Order Service.</p>
+                    </div>
+                </div>
+                <div class="perk">
+                    <span class="perk-icon">🔒</span>
+                    <div>
+                        <strong>Reliable Pricing</strong>
+                        <p>Prices always confirmed live from Product Service.</p>
+                    </div>
+                </div>
+                <div class="perk">
+                    <span class="perk-icon">⚙️</span>
+                    <div>
+                        <strong>Built for Cloud</strong>
+                        <p>Microservices ready to ship to AWS EKS.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="brand-mark">CC</span>
+                <span class="brand-name">CloudCart</span>
+            </div>
+            <p class="footer-note">Product Service :8081 · Order Service :8082 · Auth Service :8083 · PostgreSQL :5432</p>
+            <p class="footer-copy">Built as a DevOps learning project — not a real store.</p>
+        </div>
+    </footer>
+
+    <!-- Auth modal: hidden by default, opened via Login/Sign Up buttons in the navbar -->
+    <div id="authModal" class="modal-overlay hidden">
+        <div class="modal">
+            <button type="button" class="modal-close" id="authModalClose" aria-label="Close">&times;</button>
+
+            <div class="modal-tabs">
+                <button type="button" class="modal-tab active" data-tab="login">Log In</button>
+                <button type="button" class="modal-tab" data-tab="signup">Sign Up</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <label>
+                    Email
+                    <input type="email" id="loginEmail" autocomplete="email" required />
+                </label>
+                <label>
+                    Password
+                    <input type="password" id="loginPassword" autocomplete="current-password" required />
+                </label>
+                <p class="auth-error hidden" id="loginError"></p>
+                <button type="submit" class="auth-submit">Log In</button>
+            </form>
+
+            <form id="signupForm" class="auth-form hidden">
+                <label>
+                    Name
+                    <input type="text" id="signupName" autocomplete="name" required />
+                </label>
+                <label>
+                    Email
+                    <input type="email" id="signupEmail" autocomplete="email" required />
+                </label>
+                <label>
+                    Password
+                    <input type="password" id="signupPassword" autocomplete="new-password" required />
+                </label>
+                <label>
+                    Confirm Password
+                    <input type="password" id="signupConfirmPassword" autocomplete="new-password" required />
+                </label>
+                <p class="auth-error hidden" id="signupError"></p>
+                <p class="auth-success hidden" id="signupSuccess"></p>
+                <button type="submit" class="auth-submit">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
