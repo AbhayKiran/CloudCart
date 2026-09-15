@@ -1,0 +1,127 @@
+# ==========================================
+# 1. Product Service
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudcart-product-service
+  template:
+    metadata:
+      labels:
+        app: cloudcart-product-service
+    spec:
+      containers:
+      - name: product-service
+        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-product-service:latest
+        ports:
+        - containerPort: 5001
+        resources:
+          requests:
+            memory: "48Mi"
+            cpu: "50m"
+          limits:
+            memory: "96Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudcart-product-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5001
+    targetPort: 5001
+  selector:
+    app: cloudcart-product-service
+
+---
+# ==========================================
+# 2. Order Service
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudcart-order-service
+  template:
+    metadata:
+      labels:
+        app: cloudcart-order-service
+    spec:
+      containers:
+      - name: order-service
+        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-order-service:latest
+        ports:
+        - containerPort: 5002
+        resources:
+          requests:
+            memory: "48Mi"
+            cpu: "50m"
+          limits:
+            memory: "96Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudcart-order-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5002
+    targetPort: 5002
+  selector:
+    app: cloudcart-order-service
+
+---
+# ==========================================
+# 3. Auth Service
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudcart-auth-service
+  template:
+    metadata:
+      labels:
+        app: cloudcart-auth-service
+    spec:
+      containers:
+      - name: auth-service
+        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-auth-service:latest
+        ports:
+        - containerPort: 5003
+        resources:
+          requests:
+            memory: "48Mi"
+            cpu: "50m"
+          limits:
+            memory: "96Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudcart-auth-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5003
+    targetPort: 5003
+  selector:
+    app: cloudcart-auth-service

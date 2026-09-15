@@ -29,3 +29,4 @@ application-local.yml
 
 # Local Docker files
 docker-compose.override.yml
+application/*/target/
