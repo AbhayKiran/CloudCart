@@ -41,7 +41,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cloudcart-db-service
+  name: cloudcart-db
 spec:
   type: ClusterIP
   ports:
