@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    // Refers to the Maven tool name configured under Manage Jenkins -> Tools
+    tools {
+        maven 'Maven'
+    }
+
     environment {
         AWS_REGION     = 'eu-north-1'
         AWS_ACCOUNT_ID = '531080694855'
@@ -22,6 +27,21 @@ pipeline {
             }
         }
 
+        stage('Compile Java Applications') {
+            steps {
+                script {
+                    def javaServices = ['product-service', 'order-service', 'auth-service']
+                    
+                    javaServices.each { service ->
+                        echo "Compiling ${service} using Maven..."
+                        dir("application/${service}") {
+                            sh 'mvn clean package -DskipTests'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build & Push Docker Images') {
             steps {
                 script {
@@ -29,7 +49,6 @@ pipeline {
                     
                     services.each { service ->
                         echo "Building Docker image for cloudcart-${service}..."
-                        // Updated build path to include application directory
                         sh "docker build -t ${ECR_URL}/cloudcart-${service}:${IMAGE_TAG} -t ${ECR_URL}/cloudcart-${service}:latest ./application/${service}"
                         
                         echo "Pushing Docker image for cloudcart-${service} to ECR..."
@@ -60,7 +79,6 @@ pipeline {
                 sh 'kubectl apply -f k8s/backend.yaml'
                 sh 'kubectl apply -f k8s/frontend.yaml'
                 
-                // Force Kubernetes to pull the newly built images
                 sh 'kubectl rollout restart deployment/cloudcart-frontend'
                 sh 'kubectl rollout restart deployment/cloudcart-product-service'
                 sh 'kubectl rollout restart deployment/cloudcart-order-service'
