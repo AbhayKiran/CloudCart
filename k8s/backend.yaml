@@ -1,6 +1,15 @@
-# ==========================================
-# 1. Product Service
-# ==========================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudcart-product-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8081
+      targetPort: 8081
+  selector:
+    app: product-service
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -9,67 +18,33 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cloudcart-product-service
+      app: product-service
   template:
     metadata:
       labels:
-        app: cloudcart-product-service
+        app: product-service
     spec:
       containers:
-      - name: product-service
-        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-product-service:latest
-        ports:
-        - containerPort: 5001
-        resources:
-          requests:
-            memory: "48Mi"
-            cpu: "50m"
-          limits:
-            memory: "96Mi"
-            cpu: "100m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cloudcart-product-service
-spec:
-  type: ClusterIP
-  ports:
-  - port: 5001
-    targetPort: 5001
-  selector:
-    app: cloudcart-product-service
-
----
-# ==========================================
-# 2. Order Service
-# ==========================================
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cloudcart-order-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cloudcart-order-service
-  template:
-    metadata:
-      labels:
-        app: cloudcart-order-service
-    spec:
-      containers:
-      - name: order-service
-        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-order-service:latest
-        ports:
-        - containerPort: 5002
-        resources:
-          requests:
-            memory: "48Mi"
-            cpu: "50m"
-          limits:
-            memory: "96Mi"
-            cpu: "100m"
+        - name: product-service
+          image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-product-service:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xms128m -Xmx256m"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://cloudcart-db:5432/cloudcart"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "postgres"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "384Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service
@@ -78,50 +53,43 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 5002
-    targetPort: 5002
+    - port: 8082
+      targetPort: 8082
   selector:
-    app: cloudcart-order-service
-
+    app: order-service
 ---
-# ==========================================
-# 3. Auth Service
-# ==========================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudcart-auth-service
+  name: cloudcart-order-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cloudcart-auth-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: cloudcart-auth-service
+        app: order-service
     spec:
       containers:
-      - name: auth-service
-        image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-auth-service:latest
-        ports:
-        - containerPort: 5003
-        resources:
-          requests:
-            memory: "48Mi"
-            cpu: "50m"
-          limits:
-            memory: "96Mi"
-            cpu: "100m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cloudcart-auth-service
-spec:
-  type: ClusterIP
-  ports:
-  - port: 5003
-    targetPort: 5003
-  selector:
-    app: cloudcart-auth-service
+        - name: order-service
+          image: 531080694855.dkr.ecr.eu-north-1.amazonaws.com/cloudcart-order-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xms128m -Xmx256m"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://cloudcart-db:5432/cloudcart"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "postgres"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "384Mi"
+              cpu: "250m"

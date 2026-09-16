@@ -30,7 +30,8 @@ pipeline {
         stage('Compile Java Applications') {
             steps {
                 script {
-                    def javaServices = ['product-service', 'order-service', 'auth-service']
+                    // Removed auth-service to conserve node RAM
+                    def javaServices = ['product-service', 'order-service']
                     
                     javaServices.each { service ->
                         echo "Compiling ${service} using Maven..."
@@ -45,7 +46,8 @@ pipeline {
         stage('Build & Push Docker Images') {
             steps {
                 script {
-                    def services = ['frontend', 'product-service', 'order-service', 'auth-service']
+                    // Removed auth-service from container builds
+                    def services = ['frontend', 'product-service', 'order-service']
                     
                     services.each { service ->
                         echo "Building Docker image for cloudcart-${service}..."
@@ -82,7 +84,6 @@ pipeline {
                 sh 'kubectl rollout restart deployment/cloudcart-frontend'
                 sh 'kubectl rollout restart deployment/cloudcart-product-service'
                 sh 'kubectl rollout restart deployment/cloudcart-order-service'
-                sh 'kubectl rollout restart deployment/cloudcart-auth-service'
             }
         }
 
@@ -91,14 +92,13 @@ pipeline {
                 sh 'kubectl rollout status deployment/cloudcart-frontend --timeout=120s'
                 sh 'kubectl rollout status deployment/cloudcart-product-service --timeout=120s'
                 sh 'kubectl rollout status deployment/cloudcart-order-service --timeout=120s'
-                sh 'kubectl rollout status deployment/cloudcart-auth-service --timeout=120s'
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment successful! All 5 pods (4 Microservices + 1 DB) are live on EKS.'
+            echo 'Deployment successful! All 4 pods (3 Microservices + 1 DB) are live on EKS.'
             sh 'kubectl get pods -o wide'
             sh 'kubectl get svc'
         }
