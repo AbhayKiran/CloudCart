@@ -1,4 +1,4 @@
-const PRODUCT_SERVICE_URL = "http://localhost:8081";
+const PRODUCT_API_URL = "/api/products";
 const ORDER_SERVICE_URL = "http://localhost:8082";
 const AUTH_SERVICE_URL = "http://localhost:8083";
 const TOKEN_KEY = "cloudcart_token";

@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    // Refers to the Maven tool name configured under Manage Jenkins -> Tools
+    // Refers to the Maven tool configured under Manage Jenkins -> Tools
     tools {
         maven 'Maven'
     }
@@ -30,7 +30,7 @@ pipeline {
         stage('Compile Java Applications') {
             steps {
                 script {
-                    // Removed auth-service to conserve node RAM
+                    // product-service and order-service only (auth-service removed to save node RAM)
                     def javaServices = ['product-service', 'order-service']
                     
                     javaServices.each { service ->
@@ -46,7 +46,6 @@ pipeline {
         stage('Build & Push Docker Images') {
             steps {
                 script {
-                    // Removed auth-service from container builds
                     def services = ['frontend', 'product-service', 'order-service']
                     
                     services.each { service ->
@@ -67,20 +66,20 @@ pipeline {
             }
         }
 
-        stage('Deploy PostgreSQL DB') {
+        stage('Deploy Infrastructure & Microservices') {
             steps {
                 echo 'Deploying PostgreSQL Database...'
                 sh 'kubectl apply -f k8s/postgres.yaml'
                 sh 'kubectl rollout status deployment/cloudcart-db --timeout=90s'
-            }
-        }
 
-        stage('Deploy Microservices') {
-            steps {
-                echo 'Deploying Frontend and Backend Microservices...'
+                echo 'Deploying Backend & Frontend Microservices...'
                 sh 'kubectl apply -f k8s/backend.yaml'
                 sh 'kubectl apply -f k8s/frontend.yaml'
-                
+
+                echo 'Deploying NGINX Ingress Routing Rules...'
+                sh 'kubectl apply -f k8s/ingress.yaml'
+
+                echo 'Restarting deployments to pick up new ECR images...'
                 sh 'kubectl rollout restart deployment/cloudcart-frontend'
                 sh 'kubectl rollout restart deployment/cloudcart-product-service'
                 sh 'kubectl rollout restart deployment/cloudcart-order-service'
@@ -98,12 +97,12 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful! All 4 pods (3 Microservices + 1 DB) are live on EKS.'
+            echo 'Deployment successful! All microservices and Ingress are live on EKS.'
             sh 'kubectl get pods -o wide'
-            sh 'kubectl get svc'
+            sh 'kubectl get ingress cloudcart-ingress'
         }
         failure {
-            echo 'Deployment failed! Checking pod status and logs...'
+            echo 'Deployment failed! Checking pod status and descriptions...'
             sh 'kubectl get pods'
             sh 'kubectl describe pods'
         }
