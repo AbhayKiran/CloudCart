@@ -1,35 +1,28 @@
-# Maven
-target/
-*.class
-
-# IDE
-.idea/
-.vscode/
-*.iml
-
-# Environment / secrets
-.env
-*.env
-
-# Logs
-*.log
-logs/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Local Spring configuration / secrets
-application-local.properties
-application-local.yml
-
-# Credentials / keys
+# AWS Credentials & Environment
+.aws/
+credentials
 *.pem
 *.key
+.env
 
-# Local Docker files
-docker-compose.override.yml
-application/*/target/
+# Terraform Local State & Backups
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
 terraform/.terraform/
-*.tfstate
-*.tfstate.backup
+
+# Java / Maven Build Outputs
+target/
+*.class
+*.log
+
+# Node / Frontend Dependencies & Builds
+application/frontend/node_modules/
+application/frontend/dist/
+application/frontend/build/
+
+# OS & IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
