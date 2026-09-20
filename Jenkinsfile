@@ -23,6 +23,22 @@ pipeline {
                 }
             }
         }
+
+	stage('Start Test Database') {
+            steps {
+                // Spins up a temporary PostgreSQL container so unit/integration tests can connect to localhost:5432
+                sh '''
+                    docker run -d --name test-postgres \
+                    -e POSTGRES_DB=cloudcart \
+                    -e POSTGRES_USER=postgres \
+                    -e POSTGRES_PASSWORD=postgres \
+                    -p 5432:5432 \
+                    postgres:15-alpine
+                '''
+                // Give PostgreSQL a few seconds to initialize
+                sleep 5
+            }
+        }
         
 	stage('Build Java Artifacts') {
             steps {
