@@ -3,6 +3,11 @@ pipeline {
     environment {
         REGISTRY_URL = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
     }
+    
+    tools {
+        maven 'maven'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -17,6 +22,15 @@ pipeline {
                 }
             }
         }
+        
+	stage('Build Java Artifacts') {
+            steps {
+                sh 'mvn clean package -f application/auth-service/pom.xml'
+                sh 'mvn clean package -f application/order-service/pom.xml'
+                sh 'mvn clean package -f application/product-service/pom.xml'
+            }
+        }
+
         stage('Build & Push Microservices') {
             parallel {
                 stage('Auth Service') {
