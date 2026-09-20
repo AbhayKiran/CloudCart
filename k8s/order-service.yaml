@@ -14,6 +14,8 @@ spec:
       labels:
         app: order-service
     spec:
+      imagePullSecrets:
+      - name: ecr-secret
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -28,7 +30,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: order-service
-        image: your-registry/order-service:latest
+        image: ${REGISTRY_URL}/order-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

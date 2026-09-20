@@ -96,13 +96,14 @@ pipeline {
 	stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                    echo 'Applying Kubernetes manifests from Git...'
-                    kubectl apply -f k8s/
+                    echo 'Applying Kubernetes manifests with environment substitution...'
+                    export REGISTRY_URL="${REGISTRY_URL}"
+                    find k8s/ -type f -name '*.yaml' | xargs -I {} sh -c 'envsubst < {} | kubectl apply -f -'
                 """
             }
-        }        
+        }
     }
-    
+	    
     post {
         success {
             echo 'Pipeline completed successfully and deployed to K8s cluster!'
