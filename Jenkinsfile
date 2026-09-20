@@ -92,18 +92,15 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy to Kubernetes') {
+
+	stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                    kubectl apply -f k8s/postgres.yaml
-                    kubectl apply -f k8s/auth-service.yaml
-                    kubectl apply -f k8s/order-service.yaml
-                    kubectl apply -f k8s/product-service.yaml
-                    kubectl apply -f k8s/frontend.yaml
+                    echo 'Applying Kubernetes manifests from Git...'
+                    kubectl apply -f k8s/
                 """
             }
-        }
+        }        
     }
     
     post {
