@@ -11,24 +11,26 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-		cleanWs()
+                cleanWs()
                 checkout scm
             }
         }
+        
         stage('Login to AWS ECR') {
             steps {
-                // Uses the AWS credentials stored in Jenkins global store
                 withCredentials([aws(credentialsId: 'aws-credentials', region: "${env.AWS_REGION}")]) {
                     sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY_URL}"
                 }
             }
         }
 
-	stage('Start Test Database') {
+        stage('Start Test Database') {
             steps {
-                // We set the password to 'cloudcartpassword' (or any password you prefer) 
-                // and pass it as an environment variable to Maven using withEnv
                 sh '''
+                    # Stop and remove the old container if it exists
+                    docker rm -f test-postgres || true
+                    
+                    # Start a fresh test database container
                     docker run -d --name test-postgres \
                     -e POSTGRES_DB=cloudcart \
                     -e POSTGRES_USER=cloudcart \
@@ -87,6 +89,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
@@ -99,12 +102,17 @@ pipeline {
             }
         }
     }
+    
     post {
         success {
             echo 'Pipeline completed successfully and deployed to K8s cluster!'
         }
         failure {
             echo 'Pipeline failed during execution.'
+        }
+        always {
+            // Optional cleanup for the test database container after pipeline finishes
+            sh 'docker rm -f test-postgres || true'
         }
     }
 }
