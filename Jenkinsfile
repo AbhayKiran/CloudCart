@@ -42,10 +42,13 @@ pipeline {
             }
         }
 
-        stage('Build Java Artifacts') {
+	stage('Build Java Artifacts') {
             steps {
-                // Pass DB_PASSWORD as an environment variable to Maven so Spring Boot can connect successfully
-                withEnv(['DB_PASSWORD=cloudcartpassword']) {
+                // Pass both DB_PASSWORD and JWT_SECRET as environment variables to Maven
+                withEnv([
+                    'DB_PASSWORD=cloudcartpassword', 
+                    'JWT_SECRET=mySuperSecretJwtKeyForCloudCartApp2026SecureKey!@#'
+                ]) {
                     sh 'mvn clean package -f application/auth-service/pom.xml'
                     sh 'mvn clean package -f application/order-service/pom.xml'
                     sh 'mvn clean package -f application/product-service/pom.xml'
