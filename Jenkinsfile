@@ -26,25 +26,28 @@ pipeline {
 
 	stage('Start Test Database') {
             steps {
-                // Spins up a temporary PostgreSQL container so unit/integration tests can connect to localhost:5432
+                // We set the password to 'cloudcartpassword' (or any password you prefer) 
+                // and pass it as an environment variable to Maven using withEnv
                 sh '''
                     docker run -d --name test-postgres \
                     -e POSTGRES_DB=cloudcart \
-                    -e POSTGRES_USER=postgres \
-                    -e POSTGRES_PASSWORD=postgres \
+                    -e POSTGRES_USER=cloudcart \
+                    -e POSTGRES_PASSWORD=cloudcartpassword \
                     -p 5432:5432 \
                     postgres:15-alpine
                 '''
-                // Give PostgreSQL a few seconds to initialize
                 sleep 5
             }
         }
-        
-	stage('Build Java Artifacts') {
+
+        stage('Build Java Artifacts') {
             steps {
-                sh 'mvn clean package -f application/auth-service/pom.xml'
-                sh 'mvn clean package -f application/order-service/pom.xml'
-                sh 'mvn clean package -f application/product-service/pom.xml'
+                // Pass DB_PASSWORD as an environment variable to Maven so Spring Boot can connect successfully
+                withEnv(['DB_PASSWORD=cloudcartpassword']) {
+                    sh 'mvn clean package -f application/auth-service/pom.xml'
+                    sh 'mvn clean package -f application/order-service/pom.xml'
+                    sh 'mvn clean package -f application/product-service/pom.xml'
+                }
             }
         }
 
